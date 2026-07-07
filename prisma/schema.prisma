@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reviews   Review[]
+}
+
+model Review {
+  id               String            @id @default(uuid())
+  userId           String
+  title            String?
+  description      String?
+  submissionType   SubmissionType
+  language         String?
+  status           ReviewStatus      @default(PENDING)
+  overallScore     Int?
+  summary          String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  aireview         AIReview?
+  codeFiles        CodeFile[]
+  complexityReport ComplexityReport?
+  findings         Finding[]
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  staticAnalysis   StaticAnalysis?
+}
+
+model CodeFile {
+  id        String   @id @default(uuid())
+  reviewId  String
+  fileName  String
+  extension String
+  language  String
+  content   String
+  size      Int
+  createdAt DateTime @default(now())
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+}
+
+model StaticAnalysis {
+  id        String @id @default(uuid())
+  reviewId  String @unique
+  summary   Json
+  rawOutput Json
+  review    Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+}
+
+model ComplexityReport {
+  id                   String @id @default(uuid())
+  reviewId             String @unique
+  cyclomaticComplexity Int?
+  linesOfCode          Int?
+  functionCount        Int?
+  classCount           Int?
+  maintainability      Float?
+  breakdown            Json
+  review               Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+}
+
+model AIReview {
+  id         String   @id @default(uuid())
+  reviewId   String   @unique
+  reviewJson Json
+  createdAt  DateTime @default(now())
+  review     Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+}
+
+model Finding {
+  id          String        @id @default(uuid())
+  reviewId    String
+  source      FindingSource
+  severity    Severity
+  type        String
+  title       String
+  description String
+  suggestion  String?
+  fileName    String?
+  lineNumber  Int?
+  review      Review        @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+}
+
+enum SubmissionType {
+  PASTED_CODE
+  FILE_UPLOAD
+}
+
+enum ReviewStatus {
+  PENDING
+  ANALYZING
+  AI_REVIEW
+  COMPLETED
+  FAILED
+}
+
+enum FindingSource {
+  STATIC_ANALYSIS
+  AI_MODEL
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}

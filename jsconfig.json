@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "strict": false,
+    "checkJs": false
+  },
+  "exclude": ["node_modules", "dist", ".git"]
+}
