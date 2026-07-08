@@ -35,7 +35,7 @@ export const registerUser = (req, res) => {
                 res.cookie('token', token, {
                     httpOnly: true,
                     secure: true,        // Required for production (HTTPS)
-                    sameSite: 'lax',    // REQUIRED for cross-site cookies
+                    sameSite: 'none',    // REQUIRED for cross-site cookies
                     maxAge: 24 * 60 * 60 * 1000 // 1 day
                 });
                 res.send({ message: 'User registered successfully', token });
@@ -49,7 +49,7 @@ export const registerUser = (req, res) => {
 
 
 export const logoutUser = (req, res) => {
-    res.clearCookie('token');
+    res.clearCookie('token', { sameSite: 'none', secure: true });
     // res.redirect('/login');
     res.status(200).send({ message: 'Logged out successfully' });
 };
@@ -69,7 +69,7 @@ export const loginUser = async (req, res) => {
                 res.cookie('token', token, {
                     httpOnly: true,
                     secure: true,        // Required for production (HTTPS)
-                    sameSite: 'lax',    // REQUIRED for cross-site cookies
+                    sameSite: 'none',    // REQUIRED for cross-site cookies
                     maxAge: 24 * 60 * 60 * 1000 // 1 day
                 });
                 res.send({ message: 'Login successful', token, user: { id: user.id, name: user.name, email: user.email } });
